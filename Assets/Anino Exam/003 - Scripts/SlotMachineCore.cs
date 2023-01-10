@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using Random = UnityEngine.Random;
 
 public class SlotMachineCore : MonoBehaviour
 {
@@ -40,6 +41,7 @@ public class SlotMachineCore : MonoBehaviour
     [Header("SPIN VARIABLES")]
     [SerializeField] private Button SpinBtn;
     [SerializeField] private GameObject VisiblePlatformLines;
+    [ReadOnly] public List<int> LinesToLightUp; 
 
     [Header("PLAYER VARIABLES")]
     [SerializeField] private TextMeshProUGUI PlayerCoinsTMP;
@@ -49,6 +51,9 @@ public class SlotMachineCore : MonoBehaviour
     [ReadOnly] public bool ReelsAreSpinning;
     [ReadOnly] public int FinishedReels;
     private int[,] resultMatrix = new int[3, 5];
+    public List<int> currentPlatformLine;
+    public List<List<int>> quadruplets;
+    public List<List<int>> triplets;
     //========================================================================================================
     #endregion
 
@@ -91,6 +96,7 @@ public class SlotMachineCore : MonoBehaviour
 
     public void SpinSlotMachine()
     {
+        FinishedReels = 0;
         HidePlatformLines();
         if (!ReelsAreSpinning)
         {
@@ -102,15 +108,17 @@ public class SlotMachineCore : MonoBehaviour
             ReelsAreSpinning = true;
             foreach (ReelCore reel in ReelControllers)
             {
-                reel.SpinTimeLeft = SpinTime * UnityEngine.Random.Range(1, 1.5f);
-                reel.isSpinning = true;
-                reel.spinSpeed = 50;
+                reel.spriteStartingPoint = Random.Range(0, reel.SymbolSprites.Count);
+                reel.ResetReel(reel.spriteStartingPoint);
+                reel.StartSpinning();
             }
         }
         else
         {
             foreach (ReelCore reel in ReelControllers)
+            {   reel.transform.localPosition = new Vector3(reel.transform.localPosition.x, 0, reel.transform.localPosition.z); ;
                 reel.StopSpinning();
+            }
             ReelsAreSpinning = false;
         }
         SpinBtn.interactable = ReelsAreSpinning;
@@ -122,6 +130,9 @@ public class SlotMachineCore : MonoBehaviour
             VisiblePlatformLines.SetActive(true);
         else
             HidePlatformLines();
+
+        foreach(Transform child in VisiblePlatformLines.transform)
+            child.gameObject.SetActive(true);
     }
 
     private void HidePlatformLines()
@@ -141,54 +152,54 @@ public class SlotMachineCore : MonoBehaviour
             resultMatrix[2, i] = ReelControllers[i].BelowValue;
         }
 
+        /*// Print result Matrix
+        for(int i = 0; i < resultMatrix.GetLength(0); i++)
+        {
+            Debug.Log(resultMatrix[i, 0] + ", " + resultMatrix[i, 1] + ", " + resultMatrix[i, 2] + ", " + resultMatrix[i, 3] + ", " + resultMatrix[i, 4]);
+        }*/
         CalculateWinnings();
     }
 
     public void CalculateWinnings()
     {
         TotalWinnings = 0;
-        List<int> currentPlatformLine;
-        foreach (PlatformLine line in PlatformLines)
-            line.willSkip = false;
+        foreach (Transform child in VisiblePlatformLines.transform)
+            child.gameObject.SetActive(false);
+        VisiblePlatformLines.SetActive(true);
 
         for (int i = 0; i < PlatformLines.Count; i++)
         {
-            if (PlatformLines[i].willSkip)
-                continue;
-
             currentPlatformLine = GetPlatformLineResult(PlatformLines[i].placements);
 
             //  Check for 5-Streak
             if (currentPlatformLine.Distinct().Count() == 1)
             {
+                PlatformLines[i].correspondingLine.SetActive(true);
                 TotalWinnings += GetCorrespondingSymbol(currentPlatformLine[0]).QuintiplePayout;
-
-                
                 continue;
             }
 
             //  Check for 4-Streak
-            List<List<int>> quadruplets = new List<List<int>>();
+            quadruplets.Clear();
             quadruplets.Add(new List<int>(currentPlatformLine.GetRange(0, 4)));
             quadruplets.Add(new List<int>(currentPlatformLine.GetRange(1, 4)));
             foreach (var quadruplet in quadruplets)
             {
                 if (quadruplet.Distinct().Count() == 1)
                 {
-                    Debug.Log("Matched line: " + i);
+                    /*Debug.Log("Matched line index: " + i);
                     string matchedLine = "";
                     for (int j = 0; j < quadruplet.Count; j++)
-                    {
                         matchedLine += quadruplet[j].ToString() + " ";
-                    }
-                    Debug.Log("Matched line: " + matchedLine);
+                    Debug.Log("Matched line quad: " + matchedLine);*/
+                    PlatformLines[i].correspondingLine.SetActive(true);
                     TotalWinnings += GetCorrespondingSymbol(quadruplet[0]).QuadruplePayout;
-                    continue;
+                    break;
                 }
             }
 
-            //  Check for 3-Streak
-            List<List<int>> triplets = new List<List<int>>();
+            //  Check for 3-Streak only if no quad has been found
+            triplets.Clear();
             triplets.Add(new List<int>(currentPlatformLine.GetRange(0, 3)));
             triplets.Add(new List<int>(currentPlatformLine.GetRange(1, 3)));
             triplets.Add(new List<int>(currentPlatformLine.GetRange(2, 3)));
@@ -196,36 +207,16 @@ public class SlotMachineCore : MonoBehaviour
             {
                 if (triplet.Distinct().Count() == 1)
                 {
-                    Debug.Log("Matched line: " + i);
+                    /*Debug.Log("Matched line index: " + i);
                     string matchedLine = "";
                     for (int j = 0; j < triplet.Count; j++)
-                    {
                         matchedLine += triplet[j].ToString() + " ";
-                    }
-                    Debug.Log("Matched line: " + matchedLine);
-
+                    Debug.Log("Matched line triad: " + matchedLine);*/
+                    PlatformLines[i].correspondingLine.SetActive(true);
                     TotalWinnings += GetCorrespondingSymbol(triplet[0]).TriplePayout;
-                    continue;
+                    break;
                 }
             }
-
-            //  Handle redundant platform lines
-            /*if (i == 0)
-                PlatformLines[6].willSkip = true;
-            else if (i == 1)
-            {
-                PlatformLines[7].willSkip = true;
-                PlatformLines[8].willSkip = true;
-                PlatformLines[11].willSkip = true;
-                PlatformLines[12].willSkip = true;
-            }
-            else if (i == 2)
-            {
-                PlatformLines[5].willSkip = true;
-                PlatformLines[19].willSkip = true;
-            }
-            else if (i == 7)
-                PlatformLines[12].willSkip = true;*/
         }
 
         TotalWinnings *= BetMultiplier;

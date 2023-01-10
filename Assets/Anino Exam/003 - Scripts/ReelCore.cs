@@ -7,91 +7,63 @@ public class ReelCore : MonoBehaviour
     //===========================================================================================
     [SerializeField] private SlotMachineCore SlotMachineCore;
 
-
-    [Header("SPINNING TIME")]
-    [ReadOnly] public float SpinTimeLeft;
+    [Header("SYMBOL CHILDREN")]
+    [SerializeField] public List<SymbolCore> ChildSymbols;
+    [SerializeField] public List<Sprite> SymbolSprites;
 
     [Header("REEL VALUES")]
-    [ReadOnly] public int MiddleValue;
     [ReadOnly] public int AboveValue;
+    [ReadOnly] public int MiddleValue;
     [ReadOnly] public int BelowValue;
 
     [Header("DEBUGGER")]
     [ReadOnly] public bool isSpinning;
     [ReadOnly] public float spinSpeed;
     [SerializeField][ReadOnly] private float variance;
+    [ReadOnly] public int spinCounter;
+    [ReadOnly] public int spriteStartingPoint;
     //===========================================================================================
+
+    public void ResetReel(int spriteStartingPoint)
+    {
+        transform.localPosition = new Vector3(transform.localPosition.x, -3, transform.localPosition.z);;
+
+        foreach (SymbolCore child in ChildSymbols)
+        {
+            child.spriteIndex = spriteStartingPoint;
+            child.SpriteRenderer.sprite = SymbolSprites[child.spriteIndex];
+            child.NumericalValue = child.spriteIndex + 1;
+            spriteStartingPoint--;
+            if (spriteStartingPoint == -1)
+                spriteStartingPoint = SymbolSprites.Count - 1;
+        }
+
+        AboveValue = ChildSymbols[0].NumericalValue;
+        MiddleValue = ChildSymbols[1].NumericalValue;
+        BelowValue = ChildSymbols[2].NumericalValue;
+    }
+
+    public void StartSpinning()
+    {
+        LeanTween.moveLocalY(gameObject, 0, 2).setEase(LeanTweenType.easeOutCubic).setOnComplete(() =>
+        {
+            StopSpinning();
+        });
+    }
 
     public void StopSpinning()
     {
+        //LeanTween.cancelAll();
         isSpinning = false;
-        FixReelAlignment();
+        AboveValue = ChildSymbols[ChildSymbols.Count - 3].NumericalValue;
+        MiddleValue = ChildSymbols[ChildSymbols.Count - 2].NumericalValue;
+        BelowValue = ChildSymbols[ChildSymbols.Count -1].NumericalValue;
         SlotMachineCore.FinishedReels++;
-        if (SlotMachineCore.FinishedReels == 5)
+        if(SlotMachineCore.FinishedReels == 5)
         {
             SlotMachineCore.ReelsAreSpinning = false;
             SlotMachineCore.GetResultMatrix();
         }
+        
     }
-
-    #region UTILITY FUNCTIONS
-    private void FixReelAlignment()
-    {
-        variance = transform.localPosition.y % 0.335f;
-        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - variance, transform.localPosition.z);
-        GetValues();
-    }
-    public void GetValues()
-    {
-        switch (transform.localPosition.y)
-        {
-            case -0.335f * 0f:
-                MiddleValue = 1;
-                break;
-            case -0.335f * 1f:
-                MiddleValue = 2;
-                break;
-            case -0.335f * 2f:
-                MiddleValue = 3;
-                break;
-            case -0.335f * 3f:
-                MiddleValue = 4;
-                break;
-            case -0.335f * 4f:
-                MiddleValue = 5;
-                break;
-            case -0.335f * 5f:
-                MiddleValue = 6;
-                break;
-            case -0.335f * 6f:
-                MiddleValue = 7;
-                break;
-            case -0.335f * 7f:
-                MiddleValue = 8;
-                break;
-            case -0.335f * 8f:
-                MiddleValue = 9;
-                break;
-            case -0.335f * 9f:
-                MiddleValue = 10;
-                break;
-        }
-
-        switch (MiddleValue)
-        {
-            case 10:
-                AboveValue = 1;
-                BelowValue = 9;
-                break;
-            case 1:
-                AboveValue = 2;
-                BelowValue = 10;
-                break;
-            default:
-                AboveValue = MiddleValue + 1;
-                BelowValue = MiddleValue - 1;
-                break;
-        }
-    }
-    #endregion
 }

@@ -7,7 +7,7 @@ This project runs on Unity 2020.3.37f1. The "SlotMachineScene" scene must be pla
 # Gameplay Tutorial
 The game starts with 100,000 coins. Pressing the increase button will increment the bet amount by 20 coins. Pressing the decrease button will decrement the total bet amount bt 20 coins as well.. Each increment increases the total winnings multiplier. (For example, if the total bet was 60 coins, the multiploer would be 3. If the value of the winnings is 27, the player will receive 81 coins).
 
-If the bet amount is valid, the Spin Button will be unlocked. Once the player presses the spin button, the reels will spin for an average of 5 seconds. Players may opt to pess the Spin Button again while all the reels are spinning to make them all stop instantly. All possible line combinations can be seen by pressing the info button at the upper-right corner of the screen. 
+If the bet amount is valid, the Spin Button will be unlocked. Once the player presses the spin button, the reels will spin for an average of 5 seconds. Players may opt to pess the Spin Button again while all the reels are spinning to make them all stop toward their pre-determined ending point. All possible line combinations can be seen by pressing the info button at the upper-right corner of the screen. 
 
 # Code Structure
 The game is manages by the SlotMachineCore.cs and SlotMachineController.cs files attacked to the SlotMachineManager game object. Each reel in the slot machine has a ReelPrefab as it's child containing symbols labelled 1-10. The SlotMachineCore class contains a nested PlatformLine class which can be instantiated and serialized for viewing in the inspector. The PlatformLine class contains a List of placement combinations which the result matrix will base its results on, and a reference to a game object showing a visual for that line placement.
@@ -25,7 +25,7 @@ The acceptable line combinations may be tweaked by changing their internal value
 # MVC Usage
 This project uses a certain system for the naming and structuring of scripts, All built-in Unity functions such as Start() and Update() are placed in scripts with a -Controller suffix. (i.e., ReelController, SlotMachineController) 
 
-All core variables and functions are placed in scripts with a -Core suffix (i.e., ReelCore, SlotMachineCore). These Core scripts contain both UI variables for viewing, and calculation functions within the reel and slot machine model. These variables and functions are separated into collapsable regions for organization and easier understanding.
+All core variables and functions are placed in scripts with a -Core suffix (e.g., ReelCore, SlotMachineCore, etc.). These Core scripts contain both UI variables for viewing, and calculation functions within the reel and slot machine model. These variables and functions are separated into collapsable regions for organization and easier understanding.
 
 Scripts that are solely used for data storage have a -Data suffix (SymbolData) and extends the ScriptableObject class.
 
