@@ -5,7 +5,7 @@
 This project runs on Unity 2020.3.37f1. The "SlotMachineScene" scene must be placed in the build settings as build index 0.
 
 # Gameplay Tutorial
-The game starts with 100,000 coins. Pressing the increase button will increment the bet amount by 20 coins. Pressing the decrease button will decrement the total bet amount bt 20 coins as well. Each increment increases the total winnings multiplier. (For example, if the total bet was 60 coins, the multiploer would be 3. If the value of the winnings is 27, the player will receive 81 coins).
+The game starts with 100,000 coins. Pressing the increase button will increment the bet amount by 20 coins. Pressing the decrease button will decrement the total bet amount bt 20 coins as well. Each increment increases the total winnings multiplier. (For example, if the total bet was 60 coins, the multiplier would be 3. If the value of the winnings is 27, the player will receive 81 coins).
 
 If the bet amount is valid, the Spin Button will be unlocked. Once the player presses the spin button, the reels will spin for an average of 5 seconds. Players may opt to pess the Spin Button again while all the reels are spinning to make them all stop toward their pre-determined ending point. All possible line combinations can be seen by pressing the info button at the upper-right corner of the screen. 
 
