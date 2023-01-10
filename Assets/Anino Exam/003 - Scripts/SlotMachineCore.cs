@@ -22,7 +22,7 @@ public class SlotMachineCore : MonoBehaviour
     //========================================================================================================
     [Header("PLATFORM VARIABLES")]
     [SerializeField] private List<PlatformLine> PlatformLines;
-    [SerializeField] private List<ReelController> ReelControllers;
+    [SerializeField] private List<ReelCore> ReelControllers;
     [SerializeField] private List<SymbolData> Symbols;
     public int SpinTime;
 
@@ -100,7 +100,7 @@ public class SlotMachineCore : MonoBehaviour
             WinningTMP.text = "WINNINGS: " + TotalWinnings;
             FinishedReels = 0;
             ReelsAreSpinning = true;
-            foreach (ReelController reel in ReelControllers)
+            foreach (ReelCore reel in ReelControllers)
             {
                 reel.SpinTimeLeft = SpinTime * UnityEngine.Random.Range(1, 1.5f);
                 reel.isSpinning = true;
@@ -109,7 +109,7 @@ public class SlotMachineCore : MonoBehaviour
         }
         else
         {
-            foreach (ReelController reel in ReelControllers)
+            foreach (ReelCore reel in ReelControllers)
                 reel.StopSpinning();
             ReelsAreSpinning = false;
         }

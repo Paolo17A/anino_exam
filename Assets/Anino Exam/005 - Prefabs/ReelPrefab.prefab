@@ -92,6 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4135752946388239142}
   - component: {fileID: 1589147033895464808}
+  - component: {fileID: 3367950452599166245}
   m_Layer: 0
   m_Name: ReelPrefab
   m_TagString: Untagged
@@ -135,6 +136,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9be53ac1f148725428126f081db33714, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SlotMachineCore: {fileID: 0}
+  ReelCore: {fileID: 3367950452599166245}
+--- !u!114 &3367950452599166245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4135752946388239137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5192863264bce9547a88cff26ceb2c5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SlotMachineCore: {fileID: 0}
